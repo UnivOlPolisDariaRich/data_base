@@ -15,19 +15,19 @@ VER_2.1
 SELECT DISTINCT SNAME
 FROM S
 WHERE SN IN (SELECT SN
-                         FROM SPJ
-                         WHERE PN IN (SELECT PN
-                                                  FROM P
-                                                  WHERE COLOR =  'RED'))
+             FROM SPJ
+             WHERE PN IN (SELECT PN
+                          FROM P
+                          WHERE COLOR =  'RED'))
 
 VER_2.2
 SELECT DISTINCT S.SNAME
 FROM S
 WHERE EXISTS(SELECT *
-                          FROM SPJ
-                          WHERE S.SN = SPJ.SN AND EXISTS(SELECT *
-                                                                                      FROM P 
-                                                                                      WHERE P.COLOR='RED' AND SPJ.PN = P.PN))
+             FROM SPJ
+             WHERE S.SN = SPJ.SN AND EXISTS(SELECT *
+                                            FROM P 
+                                            WHERE P.COLOR='RED' AND SPJ.PN = P.PN))
 
 
 3)Визначити імена постачальників, які не постачають червоні деталі 
@@ -40,27 +40,27 @@ VER_3.1
 SELECT DISTINCT SNAME
 FROM S
 WHERE SN IN (SELECT SN
-                         FROM SPJ
-                         WHERE PN NOT IN (SELECT PN
-                                                           FROM P
-                                                           WHERE COLOR =  'RED'))
+             FROM SPJ
+             WHERE PN NOT IN (SELECT PN
+                              FROM P
+                              WHERE COLOR =  'RED'))
 
 VER_3.2
 SELECT DISTINCT S.SNAME
 FROM S
 WHERE EXISTS(SELECT *
-                          FROM SPJ
-                          WHERE S.SN = SPJ.SN AND EXISTS(SELECT *
-                                                                                      FROM P 
-                                                                                      WHERE P.COLOR<>'RED' AND SPJ.PN = P.PN))
+             FROM SPJ
+             WHERE S.SN = SPJ.SN AND EXISTS(SELECT *
+                                            FROM P 
+                                            WHERE P.COLOR<>'RED' AND SPJ.PN = P.PN))
 
 
 4)Визначити імена постачальників, які постачають лише червоні деталі.
 SELECT DISTINCT S.SNAME
 FROM S
 WHERE SN NOT IN (SELECT SN 
-                                 FROM SPJ
-                                 WHERE S.SN = SPJ.SN AND PN NOT IN (SELECT PN 
-                                                                                                  FROM P 
-                                                                                                   WHERE P.COLOR <>  'RED' AND 
-                                                                                                                 P.PN = SPJ.PN))
+                 FROM SPJ
+                 WHERE S.SN = SPJ.SN AND PN NOT IN (SELECT PN 
+                                                    FROM P 
+                                                    WHERE P.COLOR <>  'RED' AND 
+                                                                   P.PN = SPJ.PN))
