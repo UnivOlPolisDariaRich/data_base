@@ -1,0 +1,72 @@
+ __________________Лекція 8__________________
+1) Визначити імена постачальників, які постачають усі деталі
+SELECT SNAME, S.SN, COUNT(*) AS X
+FROM (SELECT DISTINCT S.SN, SPJ.PN, SNAME
+             FROM S, SPJ
+             WHERE S.SN = SPJ.SN)
+GROUP BY SNAME, S.SN
+
+SELECT SNAME
+FROM SC
+WHERE X = (SELECT COUNT(*) FROM P)
+
+
+2) Сумарна вага QTY для кожного постачальника
+SELECT S.SN, S.SNAME, SUM(SPJ.QTY*P.WEIGHT) AS X
+FROM S, P, SPJ
+WHERE S.SN = SPJ.SN AND SPJ.PN = P.PN
+GROUP BY S.SN, S.SNAME
+
+3) Сумарна вага QTY для кожного постачальника більше за 500
+
+SELECT S.SN, S.SNAME
+FROM S, P, SPJ
+WHERE S.SN = SPJ.SN AND SPJ.PN = P.PN
+GROUP BY S.SN, S.SNAME
+HAVING SUM(SPJ.QTY*P.WEIGHT) > 500
+
+4) Визначити імена постачальників, які нічого не постачають
+
+Створимо підзапит (Ніколас буде з NULL клітинкою), назвемо LJ
+SELECT * - просто поєднуємо дві таблиці S і SPJ
+FROM S LEFT JOIN SPJ ON SPJ.SN = S.SN 
+
+Ось основний запит (эдиний правильний з 4)
+SELECT SNAME
+FROM LJ
+WHERE PN IS NULL
+
+Нюансы:True = 1, False = 0, Unknown - 1/2, AND - вибрати (min), OR - вибрати (max)
+
+5) Збільшити вдвічі статус всіх Лондонських постачальників
+
+UPDATE S - вибириємо після ключового слова ім'я таблиця, яку будемо оновлювати
+SET STATUS = STATUS * 2 - через кому записуємо список присвоєння оновлень
+WHERE CITY = 'LONDON'
+
+тестовий запит - додати сто до статусу всіх постачальників червоних деталей
+UPDATE S
+SET STATUS = STATUS + 100
+WHERE S.SN IN (SELECT SN
+                            FROM SPJ, P
+                            WHERE P.COLOR = 'RED' AND P.PN = SPJ.PN)
+
+6) Додати ще один Київський проект з назвою 'KNU'
+1 - варіант
+INSERT INTO J
+VALUES ('J5', 'KNU', 'KYIV') - додаємо кортеж значень
+
+7) Додати в J_COPY кортеж значень Лондонських деталей
+2 - варіант
+створимо J_COPY - утворити порожню
+
+INSERT INTO J_COPY
+SELECT *
+FROM J
+WHERE CITY = 'LONDON'
+
+8) Видалити з таблиці J_COPY всі проекти, які HOUSE
+
+DELETE * - завжди *
+FROM J_COPY
+WHERE JNAME = 'HOUSE'
