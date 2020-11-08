@@ -1,0 +1,101 @@
+                                                           __________________Лекція 5__________________
+1) Вибрати постачальників, що постачають всі деталі
+(не існує деталі, яку б наш постачальник не постачав)
+SELECT SNAME
+FROM S
+WHERE NOT EXISTS(SELECT *
+                                  FROM P
+                                  WHERE PN NOT IN(SELECT PN
+                                                                   FROM SPJ
+                                                                   WHERE S.SN = SPJ.SN)) 
+
+
+
+2) Визначити імена постачальників, які постачають всі червоні деталі
+(не існує червоної деталі яку б наш постальник не постачав)
+SELECT SNAME
+FROM S
+WHERE NOT EXISTS(SELECT *
+                                  FROM P
+                                  WHERE P.COLOR = 'RED' AND PN NOT IN(SELECT PN
+                                                                                                       FROM SPJ
+                                                                                                       WHERE S.SN = SPJ.SN)) 
+
+
+3)  Визначити імена постачальників, які постачають лише червоні деталі
+(не існує такої деталі, яку б наш постачальник би не постачав і вона була б не червоною)
+SELECT SNAME
+FROM S
+WHERE NOT EXISTS(SELECT *
+                                  FROM P
+                                  WHERE P.COLOR <> 'RED' AND PN NOT (SELECT PN
+                                                                                                     FROM SPJ
+                                                                                                     WHERE S.SN = SPJ.SN))
+AND S.SN IN (SELECT SN FROM SPJ) - щоб не було тих, які нічого не постачають
+
+
+4) Визначити імена постачальників, які постачають принаймні всі ті деталі, що і постачальник 'S2'
+(не існує такої деталі яку б постачав 'S2' і не постачав наш постачальник)
+SELECT SNAME
+FROM S
+WHERE NOT EXISTS(SELECT *
+                                  FROM SPJ
+                                  WHERE SN = 'S2' AND SPJ.PN NOT IN(SELECT PN
+                                                                                                    FROM SPJ
+                                                                                                    WHERE S.SN = SPJ.SN))
+
+
+
+5) Визначити імена постачальників, які постачають лише ті деталі, що і постачальник 'S2'
+SELECT SNAME
+FROM S
+WHERE NOT EXISTS(SELECT *
+                                  FROM P
+                                  WHERE PN IN (SELECT PN
+                                                           FROM SPJ
+                                                           WHERE S.SN = SPJ.SN)
+                                      AND PN NOT IN (SELECT PN
+                                                                   FROM SPJ
+                                                                   WHERE S.SN = 'S2'))
+AND S.SN IN (SELECT SN FROM SPJ) - щоб не було тих, які нічого не постачають
+
+
+
+6) Визначити імена постачальників, що постачають всі ті і тільки ті деталі, що і 'S2'
+SELECT SNAME
+FROM S
+WHERE NOT EXISTS(SELECT *
+                                  FROM P
+                                  WHERE (PN IN (SELECT PN
+                                                           FROM SPJ
+                                                           WHERE S.SN = SPJ.SN)
+                                      AND PN NOT IN (SELECT PN
+                                                                   FROM SPJ
+                                                                   WHERE S.SN = 'S2'))
+OR
+                                       (PN NOT IN (SELECT PN
+                                                           FROM SPJ
+                                                           WHERE S.SN = SPJ.SN)
+                                      AND PN IN (SELECT PN
+                                                                   FROM SPJ
+                                                                   WHERE S.SN = 'S2')))
+
+
+
+7) Визначити імена постачальників, які постачають деталі з усіх
+(Не існує такого міста з SUBQ, тобто з множини усіх міст, яке б не належало множині
+міст, які постачає наш постачальник)
+SELECT DISTINCT SNAME
+FROM S
+WHERE NOT EXISTS(SELECT *
+                                  FROM SUBQ
+                                  WHERE CITY NOT IN (SELECT CITY
+                                                                      FROM P
+                                                                      WHERE PN IN (SELECT PN
+                                                                                                FROM SPJ
+                                                                                                WHERE SPJ.SN = S.SN)))
+
+
+SUBQ - підзапит (визначити деталі з усіх міст)
+SELECT DISTINCT CITY
+FROM P
